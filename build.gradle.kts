@@ -12,6 +12,8 @@ repositories {
 }
 
 dependencies {
+    implementation("io.github.microutils:kotlin-logging:2.0.6")
+
     testImplementation(kotlin("test"))
 }
 
