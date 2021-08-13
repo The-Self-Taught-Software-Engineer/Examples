@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     implementation("io.github.microutils:kotlin-logging:2.0.6")
+    implementation("com.sun.mail:javax.mail:1.5.5")
 
     testImplementation(kotlin("test"))
 }
