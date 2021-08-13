@@ -14,15 +14,15 @@ class AssignmentService2(private val developerRepository: DeveloperRepository) {
     ): Notification {
         return developerRepository.findRandomDeveloperByType(developerType)
             ?.let { developer ->
-                developer.assigned = true
-                developerRepository.save(developer)
-
-                Assignment(
+                developer.assignment = Assignment(
                     name = generateName(assignmentType),
                     developers = setOf(developer),
                     type = assignmentType,
                     briefing = MAINTAINENANCE_DEFAULT_BRIEFING,
-                ).generateNotification()
+                )
+                developer.assignment!!.generateNotification().also {
+                    developerRepository.save(developer)
+                }
             }
             ?: error("No developer with type '$developerType' exists to assign for maintenance")
     }

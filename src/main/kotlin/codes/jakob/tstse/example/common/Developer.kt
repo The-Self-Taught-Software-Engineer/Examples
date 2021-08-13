@@ -7,5 +7,10 @@ data class Developer(
     val name: Name,
     val type: DeveloperType,
     val emailAddress: String,
-    var assigned: Boolean,
-)
+    var assignment: Assignment?,
+) {
+    val assigned: Boolean
+        get() {
+            return assignment != null
+        }
+}
