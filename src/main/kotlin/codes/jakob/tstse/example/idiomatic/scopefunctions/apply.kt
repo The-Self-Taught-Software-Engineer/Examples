@@ -22,13 +22,12 @@ class DeveloperNotificationService(
         val developer: Developer = repository.findRandomDeveloperByType(developerType)
             ?: error("No developer with type '$developerType' exists")
 
-//        val email: Message = MimeMessage(emailSession).apply {
-//            setRecipients(Message.RecipientType.TO, InternetAddress.parse(developer.emailAddress, false))
-//            replyTo = InternetAddress.parse(replyToAddress, false)
-//            sentDate = Date.from(clock.instant())
-//            subject = generateEmailSubject(developer, notification)
-//            setText(generateEmailBody(developer, notification))
-//        }
+//        val email: Message = MimeMessage(emailSession)
+//        setRecipients(Message.RecipientType.TO, InternetAddress.parse(developer.emailAddress, false))
+//        replyTo = InternetAddress.parse(replyToAddress, false)
+//        sentDate = Date.from(clock.instant())
+//        subject = generateEmailSubject(developer, notification)
+//        setText(generateEmailBody(developer, notification))
 
         val email: Message = MimeMessage(emailSession).apply {
             setRecipients(Message.RecipientType.TO, InternetAddress.parse(developer.emailAddress, false))
