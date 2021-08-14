@@ -16,16 +16,23 @@ class CollectionsDeveloperNotificationService(
     private val repository: DeveloperRepository,
 ) : DeveloperNotificationService(emailSession, clock) {
     override suspend fun notifyDevelopersByEmail(developerType: DeveloperType, notification: Notification) {
+        var step = 0
+
         val developers: Set<Developer> = repository.findDevelopersByType(developerType)
 
         developers
             .filterNot { dev ->
-                dev.assigned.also { println("Filtered: " + dev.emailAddress to dev.assigned) }
+                dev.assigned
+                    .also { println("${++step}. Filtered: ${dev.emailAddress to dev.assigned}") }
             }
             .map { dev ->
-                generateEmail(dev, notification).also { println("Mapped: " + dev.emailAddress to dev.assigned) }
+                generateEmail(dev, notification)
+                    .also { println("${++step}. Mapped: ${dev.emailAddress to dev.assigned}") }
             }
             .take(2)
-            .forEach { email -> sendEmail(email) }
+            .forEach { email ->
+                sendEmail(email)
+                    .also { println("${++step}. Sending email to ${email.firstRecipient()}") }
+            }
     }
 }

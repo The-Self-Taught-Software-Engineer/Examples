@@ -31,7 +31,6 @@ abstract class DeveloperNotificationService(
         email.apply {
             sentDate = Date.from(clock.instant())
         }
-        println("Sending email '${email.subject}' to ${email.allRecipients.map { it.toString() }.first()}")
     }
 
     private fun generateEmailSubject(developer: Developer, notification: Notification): String {
@@ -44,5 +43,8 @@ abstract class DeveloperNotificationService(
 
     companion object {
         private const val REPLY_TO_ADDRESS = "noreply@example.com"
+
+        @JvmStatic
+        protected fun Message.firstRecipient(): String = allRecipients.map { it.toString() }.first()
     }
 }
