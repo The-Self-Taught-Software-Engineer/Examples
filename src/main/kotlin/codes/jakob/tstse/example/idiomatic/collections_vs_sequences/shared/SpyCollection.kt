@@ -9,7 +9,7 @@ import mu.KotlinLogging
  */
 class SpyCollection<E>(elements: Collection<E> = emptyList()) : AbstractMutableCollection<E>() {
     init {
-        logger.trace("Instantiated ${SpyCollection::class.simpleName} with ${elements.count()} elements")
+        logger.debug { "Instantiated ${SpyCollection::class.simpleName} with ${elements.count()} elements" }
     }
 
     override val size: Int get() = backing.size
@@ -19,9 +19,9 @@ class SpyCollection<E>(elements: Collection<E> = emptyList()) : AbstractMutableC
     override fun add(element: E): Boolean {
         if (size + 1 > capacity) {
             capacity += capacity / 2
-            logger.trace("Increased capacity to $capacity")
+            logger.debug { "Increased capacity to $capacity" }
         }
-        return backing.add(element).also { logger.trace("Added $element") }
+        return backing.add(element).also { logger.debug { "Added $element" } }
     }
 
     override fun iterator(): MutableIterator<E> {
