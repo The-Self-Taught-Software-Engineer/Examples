@@ -7,6 +7,8 @@ import codes.jakob.tstse.example.common.DeveloperType
 import codes.jakob.tstse.example.common.Notification
 import codes.jakob.tstse.example.idiomatic.collections_vs_sequences.shared.DeveloperNotificationService
 import codes.jakob.tstse.example.idiomatic.scopefunctions.DeveloperRepository
+import mu.KLogger
+import mu.KotlinLogging
 import java.time.Clock
 import javax.mail.Session
 
@@ -16,7 +18,7 @@ class SequencesDeveloperNotificationService(
     private val repository: DeveloperRepository,
 ) : DeveloperNotificationService(emailSession, clock) {
     override suspend fun notifyDevelopersByEmail(developerType: DeveloperType, notification: Notification) {
-        var step = 0
+        var operation = 0
 
         val developers: Set<Developer> = repository.findDevelopersByType(developerType)
 
@@ -24,16 +26,20 @@ class SequencesDeveloperNotificationService(
             .asSequence()
             .filterNot { dev ->
                 dev.assigned
-                    .also { println("${++step}. Filtered: ${dev.emailAddress to dev.assigned}") }
+                    .also { logger.debug("${++operation}. Filtered: ${dev.emailAddress to dev.assigned}") }
             }
             .map { dev ->
                 generateEmail(dev, notification)
-                    .also { println("${++step}. Mapped: ${dev.emailAddress to dev.assigned}") }
+                    .also { logger.debug("${++operation}. Mapped: ${dev.emailAddress to dev.assigned}") }
             }
             .take(2)
             .forEach { email ->
                 sendEmail(email)
-                    .also { println("${++step}. Sending email to ${email.firstRecipient()}") }
+                    .also { logger.debug("${++operation}. Sending email to ${email.firstRecipient()}") }
             }
+    }
+
+    companion object {
+        private val logger: KLogger = KotlinLogging.logger {}
     }
 }
