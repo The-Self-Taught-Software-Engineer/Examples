@@ -10,6 +10,6 @@ data class Name(
     )
 
     override fun toString(): String {
-        return "${givenNames.joinToString { " " }} $familyName"
+        return "${givenNames.joinToString(" ")} $familyName"
     }
 }
