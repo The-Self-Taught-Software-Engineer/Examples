@@ -11,10 +11,11 @@ import java.time.Clock
 import java.util.*
 import javax.mail.Session
 import javax.mail.Transport
+import kotlin.random.Random
 
 internal class DeveloperNotificationServiceTest {
     private val faker = Faker()
-    private val assigned: List<Boolean> = listOf(true, false, true, false, true, true, false, false)
+    private val assigned: List<Boolean> = List(100) { Random.nextBoolean() }
     private val developers: Set<Developer> =
         assigned.map { assigned -> backendDeveloper(faker.name().firstName(), assigned) }.toSet()
 

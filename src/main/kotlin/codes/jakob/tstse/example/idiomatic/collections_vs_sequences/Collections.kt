@@ -22,16 +22,19 @@ class CollectionsDeveloperNotificationService(
 
         val developers: Set<Developer> = repository.findDevelopersByType(developerType)
 
-        developers
+        val unassignedDevelopers = developers
             .filterNot { dev ->
                 dev.assigned
                     .also { logger.debug("${++operation}. Filtered: ${dev.emailAddress to dev.assigned}") }
             }
+        val emails = unassignedDevelopers
             .map { dev ->
                 generateEmail(dev, notification)
                     .also { logger.debug("${++operation}. Mapped: ${dev.emailAddress to dev.assigned}") }
             }
-            .take(2)
+            .take(unassignedDevelopers.count() / 2)
+
+        emails
             .forEach { email ->
                 sendEmail(email)
                     .also { logger.debug("${++operation}. Sending email to ${email.firstRecipient()}") }

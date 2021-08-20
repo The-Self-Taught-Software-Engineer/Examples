@@ -6,6 +6,7 @@ import codes.jakob.tstse.example.common.Developer
 import codes.jakob.tstse.example.common.DeveloperType
 import codes.jakob.tstse.example.common.Notification
 import codes.jakob.tstse.example.idiomatic.collections_vs_sequences.shared.DeveloperNotificationService
+import codes.jakob.tstse.example.idiomatic.collections_vs_sequences.shared.SpyCollection.Companion.toSpyCollection
 import codes.jakob.tstse.example.idiomatic.scopefunctions.DeveloperRepository
 import mu.KLogger
 import mu.KotlinLogging
@@ -22,17 +23,21 @@ class SequencesDeveloperNotificationService(
 
         val developers: Set<Developer> = repository.findDevelopersByType(developerType)
 
-        developers
+        val unassignedDevelopers = developers
             .asSequence()
             .filterNot { dev ->
                 dev.assigned
                     .also { logger.debug("${++operation}. Filtered: ${dev.emailAddress to dev.assigned}") }
             }
+        val emails = unassignedDevelopers
             .map { dev ->
                 generateEmail(dev, notification)
                     .also { logger.debug("${++operation}. Mapped: ${dev.emailAddress to dev.assigned}") }
             }
-            .take(2)
+            .take(unassignedDevelopers.count() / 2)
+            .toSpyCollection()
+
+        emails
             .forEach { email ->
                 sendEmail(email)
                     .also { logger.debug("${++operation}. Sending email to ${email.firstRecipient()}") }
