@@ -5,7 +5,7 @@ package codes.jakob.tstse.example.idiomatic.collections_vs_sequences
 import codes.jakob.tstse.example.common.Developer
 import codes.jakob.tstse.example.common.DeveloperType
 import codes.jakob.tstse.example.common.Notification
-import codes.jakob.tstse.example.idiomatic.collections_vs_sequences.shared.DeveloperNotificationService
+import codes.jakob.tstse.example.common.DeveloperNotificationService
 import codes.jakob.tstse.example.idiomatic.scopefunctions.DeveloperRepository
 import mu.KLogger
 import mu.KotlinLogging

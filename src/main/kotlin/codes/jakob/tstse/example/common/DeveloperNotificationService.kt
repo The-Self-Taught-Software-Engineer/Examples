@@ -1,10 +1,7 @@
 @file:Suppress("RedundantSuspendModifier", "unused")
 
-package codes.jakob.tstse.example.idiomatic.collections_vs_sequences.shared
+package codes.jakob.tstse.example.common
 
-import codes.jakob.tstse.example.common.Developer
-import codes.jakob.tstse.example.common.DeveloperType
-import codes.jakob.tstse.example.common.Notification
 import java.time.Clock
 import java.util.*
 import javax.mail.Message
