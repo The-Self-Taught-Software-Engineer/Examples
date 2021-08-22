@@ -5,7 +5,7 @@ import java.time.LocalDate
 
 data class Paycheck(
     val date: LocalDate,
-    val period: Pair<LocalDate, LocalDate>,
+    val period: LocalDateRange,
     val developer: Developer,
     val hourlyRate: BigDecimal,
     val hoursWorked: BigDecimal,
@@ -17,7 +17,7 @@ data class Paycheck(
 
     class Builder {
         var date: LocalDate? = null
-        var period: Pair<LocalDate, LocalDate>? = null
+        var period: LocalDateRange? = null
         var developer: Developer? = null
         var hourlyRate: BigDecimal? = null
         var hoursWorked: BigDecimal? = null
