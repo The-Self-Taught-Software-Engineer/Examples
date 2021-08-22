@@ -17,6 +17,7 @@ dependencies {
     implementation("com.sun.mail:javax.mail:1.5.5")
     implementation("io.github.microutils:kotlin-logging:2.0.6")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.1")
+    implementation("org.junit.jupiter:junit-jupiter:5.7.0")
     implementation("org.slf4j:slf4j-api:1.7.30")
 
     testImplementation(kotlin("test"))
