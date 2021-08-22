@@ -28,60 +28,63 @@ class PaycheckService(
             .filterNot { paycheckRepository.exists(it, paycheckPeriod) }
             .mapNotNull { generateAndPersistPaycheck(today, paycheckPeriod, it) }
             .sortedBy { it.developer.name }
+            .also { logger.info { "Generated and persisted paychecks for ${it.count()} developers" } }
 
-/*        val (successfulPaychecks: List<Paycheck>, failedPaychecks: List<Developer>) =
-            developerRepository.findDevelopersByType(developerType)
-                .asSequence()
-                .filterNot { paycheckRepository.exists(it, paycheckPeriod) }
-                .map { dev ->
-                    dev to Paycheck.Builder().apply {
-                        date = today
-                        period = paycheckPeriod
-                        developer = dev
-                    }
-                }
-                .map { (dev, paycheckBuilder) ->
-                    try {
-                        dev to paycheckBuilder.apply { hourlyRate = humanResourcesService.getHourlyRate(dev) }
-                    } catch (exception: HumanResourcesClient.HumanResourcesException) {
-                        logger.error(exception) {
-                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
-                        }
-                        dev to null
-                    }
-                }.map { (dev, paycheckBuilder) ->
-                    try {
-                        dev to paycheckBuilder?.apply {
-                            hourlyRate = humanResourcesService.getHoursWorked(dev, paycheckPeriod)
-                        }
-                    } catch (exception: HumanResourcesClient.HumanResourcesException) {
-                        logger.error(exception) {
-                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
-                        }
-                        dev to null
-                    }
-                }
-                .map { (dev, paycheckBuilder) ->
-                    try {
-                        dev to paycheckBuilder?.build()
-                    } catch (exception: IllegalStateException) {
-                        logger.error(exception) {
-                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
-                        }
-                        dev to null
-                    }
-                }
-                .partition { (dev, paycheckBuilder) ->
-                    paycheckBuilder != null
-                }
-                .let { (success, failure) ->
-                    success.map { it.second!! } to failure.map { it.first }
-                }
-
-        successfulPaychecks.forEach { paycheckRepository.save(it) }
-        failedPaychecks.forEach { paycheckRepository.saveFailed(it, paycheckPeriod) }
-
-        return successfulPaychecks.sortedBy { it.developer.name }*/
+//        val (successfulPaychecks: List<Paycheck>, failedPaychecks: List<Developer>) =
+//            developerRepository.findDevelopersByType(developerType)
+//                .asSequence()
+//                .filterNot { paycheckRepository.exists(it, paycheckPeriod) }
+//                .map { dev ->
+//                    dev to Paycheck.Builder().apply {
+//                        date = today
+//                        period = paycheckPeriod
+//                        developer = dev
+//                    }
+//                }
+//                .map { (dev, paycheckBuilder) ->
+//                    try {
+//                        dev to paycheckBuilder.apply { hourlyRate = humanResourcesService.getHourlyRate(dev) }
+//                    } catch (exception: HumanResourcesClient.HumanResourcesException) {
+//                        logger.error(exception) {
+//                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
+//                        }
+//                        dev to null
+//                    }
+//                }.map { (dev, paycheckBuilder) ->
+//                    try {
+//                        dev to paycheckBuilder?.apply {
+//                            hourlyRate = humanResourcesService.getHoursWorked(dev, paycheckPeriod)
+//                        }
+//                    } catch (exception: HumanResourcesClient.HumanResourcesException) {
+//                        logger.error(exception) {
+//                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
+//                        }
+//                        dev to null
+//                    }
+//                }
+//                .map { (dev, paycheckBuilder) ->
+//                    try {
+//                        dev to paycheckBuilder?.build()
+//                    } catch (exception: IllegalStateException) {
+//                        logger.error(exception) {
+//                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
+//                        }
+//                        dev to null
+//                    }
+//                }
+//                .partition { (dev, paycheckBuilder) ->
+//                    paycheckBuilder != null
+//                }
+//                .let { (success, failure) ->
+//                    success.map { it.second!! } to failure.map { it.first }
+//                }
+//
+//        successfulPaychecks.forEach { paycheckRepository.save(it) }
+//        failedPaychecks.forEach { paycheckRepository.saveFailed(it, paycheckPeriod) }
+//
+//        return successfulPaychecks
+//            .sortedBy { it.developer.name }
+//            .also { logger.info { "Generated and persisted paychecks for ${it.count()} developers" } }
     }
 
     private fun generateAndPersistPaycheck(
