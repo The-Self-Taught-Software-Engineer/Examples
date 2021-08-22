@@ -53,20 +53,21 @@ class PaycheckService(
                     }
                 }
                 .map { (dev, paycheckBuilder) ->
-                    dev to paycheckBuilder.onSuccess {
-                        logger.info {
-                            "Generation of ${Paycheck::class.simpleName} for '$dev' succeeded and persisted"
+                    dev to paycheckBuilder
+                        .onSuccess {
+                            logger.info {
+                                "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' succeeded"
+                            }
                         }
-                    }
-                }
-                .map { (dev, paycheckBuilder) ->
-                    dev to paycheckBuilder.onFailure { exception ->
-                        logger.error(exception) {
-                            "Generation of ${Paycheck::class.simpleName} for '$dev' failed and persisted"
+                        .onFailure { exception ->
+                            logger.error(exception) {
+                                "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
+                            }
                         }
-                    }
                 }
-                .partition { it.second.isSuccess }
+                .partition { (_, paycheckBuilder) ->
+                    paycheckBuilder.isSuccess
+                }
                 .let { (success, failure) ->
                     success.map { it.second.getOrThrow() } to failure.map { it.first }
                 }
