@@ -1,6 +1,7 @@
 package codes.jakob.tstse.example.common
 
 import java.math.BigDecimal
+import java.time.LocalDate
 
 interface HumanResourcesClient {
     /**
@@ -18,7 +19,7 @@ interface HumanResourcesClient {
      * @throws UnavailableException If the [developer] did not work within the given [period].
      * @throws TimeoutException If the request to the external HR system timed out.
      */
-    fun getHoursWorked(developer: Developer, period: LocalDateRange): BigDecimal
+    fun getHoursWorked(developer: Developer, period: ClosedRange<LocalDate>): BigDecimal
 
     open class HumanResourcesException(
         override val message: String?,

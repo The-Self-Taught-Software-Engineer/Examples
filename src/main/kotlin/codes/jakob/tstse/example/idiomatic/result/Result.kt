@@ -19,25 +19,26 @@ class PaycheckService(
 ) {
     /**
      * Returns an ordered list of [Paycheck]; sorted lexicographically by the [Name] of the [Developer].
+     * Additionally, each paycheck, successfully generated or not, is persisted into the database.
      */
-    fun generatePaychecks(developerType: DeveloperType, year: Year, month: Month): List<Paycheck> {
+    fun generateAndPersistPaychecks(developerType: DeveloperType, year: Year, month: Month): List<Paycheck> {
         val today: LocalDate = LocalDate.now(clock)
-        val paycheckPeriod: LocalDateRange = determinePeriod(year, month)
+        val period: LocalDateRange = determinePeriod(year, month)
 
         return developerRepository.findDevelopersByType(developerType)
-            .filterNot { paycheckRepository.exists(it, paycheckPeriod) }
-            .mapNotNull { generateAndPersistPaycheck(today, paycheckPeriod, it) }
+            .filterNot { paycheckRepository.exists(it, period.range) }
+            .mapNotNull { generateAndPersistPaycheck(today, period, it) }
             .sortedBy { it.developer.name }
             .also { logger.info { "Generated and persisted paychecks for ${it.count()} developers" } }
 
 //        val (successfulPaychecks: List<Paycheck>, failedPaychecks: List<Developer>) =
 //            developerRepository.findDevelopersByType(developerType)
 //                .asSequence()
-//                .filterNot { paycheckRepository.exists(it, paycheckPeriod) }
+//                .filterNot { paycheckRepository.exists(it, period.range) }
 //                .map { dev ->
 //                    dev to Paycheck.Builder().apply {
 //                        date = today
-//                        period = paycheckPeriod
+//                        period = period
 //                        developer = dev
 //                    }
 //                }
@@ -48,19 +49,17 @@ class PaycheckService(
 //                        }
 //                    } catch (exception: HumanResourcesClient.HumanResourcesException) {
 //                        logger.error(exception) {
-//                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
+//                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$period' failed"
 //                        }
 //                        dev to null
 //                    }
 //                }.map { (dev, paycheckBuilder) ->
 //                    try {
 //                        dev to paycheckBuilder?.apply {
-//                            hourlyRate = humanResourcesClient.getHoursWorked(dev, paycheckPeriod)
+//                            hoursWorked = humanResourcesClient.getHoursWorked(dev, period.range)
 //                        }
 //                    } catch (exception: HumanResourcesClient.HumanResourcesException) {
-//                        logger.error(exception) {
-//                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
-//                        }
+//                        logger.error(exception) { "Generation of paycheck for '$dev' in period '$period' failed; persisting this" }
 //                        dev to null
 //                    }
 //                }
@@ -68,9 +67,7 @@ class PaycheckService(
 //                    try {
 //                        dev to paycheckBuilder?.build()
 //                    } catch (exception: IllegalStateException) {
-//                        logger.error(exception) {
-//                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
-//                        }
+//                        logger.error(exception) { "Generation of paycheck for '$dev' in period '$period' failed; persisting this" }
 //                        dev to null
 //                    }
 //                }
@@ -81,8 +78,13 @@ class PaycheckService(
 //                    success.map { it.second!! } to failure.map { it.first }
 //                }
 //
-//        successfulPaychecks.forEach { paycheckRepository.save(it) }
-//        failedPaychecks.forEach { paycheckRepository.saveFailed(it, paycheckPeriod) }
+//        successfulPaychecks.forEach { paycheck ->
+//            paycheckRepository.save(paycheck)
+//                .also { logger.info { "Generated and persisted paycheck for '${paycheck.developer}' in period '$period'" } }
+//        }
+//        failedPaychecks.forEach { dev ->
+//            paycheckRepository.saveFailed(dev, period.range)
+//        }
 //
 //        return successfulPaychecks
 //            .sortedBy { it.developer.name }
@@ -102,28 +104,24 @@ class PaycheckService(
         return Result.success(paycheckBuilder)
             .mapCatching { paycheck ->
                 paycheck.apply {
-                    hourlyRate = humanResourcesClient.getHourlyRate(paycheck.developer!!)
+                    hourlyRate = humanResourcesClient.getHourlyRate(developer)
                 }
             }
             .mapCatching { paycheck ->
                 paycheck.apply {
-                    hoursWorked = humanResourcesClient.getHoursWorked(paycheck.developer!!, paycheckPeriod)
+                    hoursWorked = humanResourcesClient.getHoursWorked(developer, paycheckPeriod.range)
                 }
             }
             .mapCatching { paycheck ->
                 paycheck.build()
             }
             .onSuccess { paycheck ->
-                logger.info {
-                    "Generation of ${Paycheck::class.simpleName} for '$developer' in period '$paycheckPeriod' succeeded"
-                }
                 paycheckRepository.save(paycheck)
+                logger.info { "Generated and persisted paycheck for '$developer' in period '$paycheckPeriod'" }
             }
             .onFailure { exception ->
-                logger.error(exception) {
-                    "Generation of ${Paycheck::class.simpleName} for '$developer' in period '$paycheckPeriod' failed"
-                }
-                paycheckRepository.saveFailed(developer, paycheckPeriod)
+                logger.error(exception) { "Generation of paycheck for '$developer' in period '$paycheckPeriod' failed; persisting this" }
+                paycheckRepository.saveFailed(developer, paycheckPeriod.range)
             }
             .getOrNull()
     }
