@@ -12,7 +12,7 @@ import java.time.Month
 import java.time.Year
 
 class PaycheckService(
-    private val humanResourcesService: HumanResourcesClient,
+    private val humanResourcesClient: HumanResourcesClient,
     private val paycheckRepository: PaycheckRepository,
     private val developerRepository: DeveloperRepository,
     private val clock: Clock,
@@ -43,7 +43,9 @@ class PaycheckService(
 //                }
 //                .map { (dev, paycheckBuilder) ->
 //                    try {
-//                        dev to paycheckBuilder.apply { hourlyRate = humanResourcesService.getHourlyRate(dev) }
+//                        dev to paycheckBuilder.apply {
+        //                        hourlyRate = humanResourcesClient.getHourlyRate(dev)
+//                        }
 //                    } catch (exception: HumanResourcesClient.HumanResourcesException) {
 //                        logger.error(exception) {
 //                            "Generation of ${Paycheck::class.simpleName} for '$dev' in period '$paycheckPeriod' failed"
@@ -53,7 +55,7 @@ class PaycheckService(
 //                }.map { (dev, paycheckBuilder) ->
 //                    try {
 //                        dev to paycheckBuilder?.apply {
-//                            hourlyRate = humanResourcesService.getHoursWorked(dev, paycheckPeriod)
+//                            hourlyRate = humanResourcesClient.getHoursWorked(dev, paycheckPeriod)
 //                        }
 //                    } catch (exception: HumanResourcesClient.HumanResourcesException) {
 //                        logger.error(exception) {
@@ -100,12 +102,12 @@ class PaycheckService(
         return Result.success(paycheckBuilder)
             .mapCatching { paycheck ->
                 paycheck.apply {
-                    hourlyRate = humanResourcesService.getHourlyRate(paycheck.developer!!)
+                    hourlyRate = humanResourcesClient.getHourlyRate(paycheck.developer!!)
                 }
             }
             .mapCatching { paycheck ->
                 paycheck.apply {
-                    hoursWorked = humanResourcesService.getHoursWorked(paycheck.developer!!, paycheckPeriod)
+                    hoursWorked = humanResourcesClient.getHoursWorked(paycheck.developer!!, paycheckPeriod)
                 }
             }
             .mapCatching { paycheck ->
