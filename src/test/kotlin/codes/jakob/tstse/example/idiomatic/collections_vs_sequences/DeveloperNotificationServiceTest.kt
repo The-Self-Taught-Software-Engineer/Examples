@@ -65,7 +65,7 @@ internal class DeveloperNotificationServiceTest {
             emailAddress = "${firstName.lowercase(Locale.getDefault())}@example.com",
             assignment = null
         ).apply {
-            assignment = if (assigned) Assignment("", setOf(this), AssignmentType.BUGFIX, "") else null
+            assignment = if (assigned) Assignment("", setOf(this), AssignmentType.BUGFIX, "", 100) else null
         }
     }
 }
