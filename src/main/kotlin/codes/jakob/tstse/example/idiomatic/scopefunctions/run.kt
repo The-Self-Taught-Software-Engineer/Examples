@@ -25,6 +25,7 @@ class AssignmentService1(private val developerRepository: DeveloperRepository) {
                     developers = setOf(this),
                     type = assignmentType,
                     briefing = MAINTAINENANCE_DEFAULT_BRIEFING,
+                    hoursEstimated = 100,
                 )
                 assignment!!.generateNotification().also {
                     developerRepository.save(this)

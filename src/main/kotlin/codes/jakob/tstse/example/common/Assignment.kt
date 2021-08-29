@@ -5,6 +5,8 @@ data class Assignment(
     val developers: Set<Developer>,
     val type: AssignmentType,
     val briefing: String,
+    val hoursEstimated: Int,
+    var hoursBooked: Int = 0,
 ) {
     fun generateNotification(): Notification {
         TODO("Not yet implemented")
